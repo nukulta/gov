@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  DATA_ENTRY
+  VIEWER
+}
+
+enum RecordStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model User {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  role            Role     @default(VIEWER)
+  failedAttempts  Int      @default(0)
+  lockedUntil     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  sessions        Session[]
+  auditLogs       AuditLog[]
+  faculties       Faculty[] @relation("FacultyCreatedBy")
+  trainings       Training[] @relation("TrainingCreatedBy")
+  participations  Participation[] @relation("ParticipationCreatedBy")
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([expiresAt])
+}
+
+model Faculty {
+  id           String       @id @default(cuid())
+  serialNo     Int          @default(autoincrement())
+  sourceKey    String?      @unique
+  honorific    String?
+  name         String?
+  topic        String?
+  post         String?
+  service      String?
+  officeAddress String?
+  email        String?
+  mobile       String?
+  status       RecordStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  createdById  String?
+  createdBy    User?        @relation("FacultyCreatedBy", fields: [createdById], references: [id])
+  @@index([name])
+  @@index([service])
+}
+
+model Training {
+  id             String       @id @default(cuid())
+  serialNo       Int          @default(autoincrement())
+  sourceKey      String?      @unique
+  name           String?
+  type           String?
+  conductedMonth String?
+  conductedYear  Int?
+  startDate      DateTime?
+  endDate        DateTime?
+  numberOfDays   Int?
+  employeeId     Int?
+  participantName String?
+  gender         String?
+  designation    String?
+  employeeType   String?
+  service        String?
+  officeName     String?
+  email          String?
+  mobile         String?
+  status         RecordStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  createdById    String?
+  createdBy      User?        @relation("TrainingCreatedBy", fields: [createdById], references: [id])
+  @@index([name])
+  @@index([conductedYear])
+}
+
+model Participation {
+  id        String       @id @default(cuid())
+  serialNo  Int          @default(autoincrement())
+  sourceKey String?      @unique
+  training  String?
+  duration  Int?
+  mode      String?
+  month     String?
+  year      Int?
+  dateFrom  DateTime?
+  dateTo    DateTime?
+  batchSize Int?
+  male      Int?
+  female    Int?
+  categories Json?
+  status    RecordStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  createdById String?
+  createdBy User?        @relation("ParticipationCreatedBy", fields: [createdById], references: [id])
+  @@index([year])
+}
+
+model TrainingDatabaseRecord {
+  id          String   @id @default(cuid())
+  serialNo    Int      @default(autoincrement())
+  sourceKey   String?  @unique
+  trainingName String?
+  duration    String?
+  facultyName String?
+  officeName  String?
+  email       String?
+  mobile      String?
+  topic       String?
+  lectures    Int?
+  bankName    String?
+  ifscCode    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  financial   RestrictedFinancialDetails?
+}
+
+model RestrictedFinancialDetails {
+  id             String @id @default(cuid())
+  recordId       String @unique
+  encryptedAccount String?
+  encryptedPan   String?
+  record         TrainingDatabaseRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+model DropdownValue {
+  id        String   @id @default(cuid())
+  category  String
+  value     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  @@unique([category, value])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([createdAt])
+}
+
+model DatabaseInitialization {
+  id          String   @id @default(cuid())
+  status      String
+  fileName    String?
+  initializedAt DateTime?
+  createdAt   DateTime @default(now())
+  initializedBy String?
+}
