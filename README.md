@@ -35,7 +35,7 @@ The seed command creates the administrator from `ADMIN_EMAIL` and `ADMIN_PASSWOR
 
 ## Vercel deployment
 
-Import the repository root as one Vercel project. [vercel.json](./vercel.json) configures the `backend` and `frontend` services, routing `/api/*` to Express and other paths to the Vite app. Both services share one public domain, so the browser uses the same-origin `/api` URL and session cookie.
+Import the repository root as one Vercel project. [vercel.json](./vercel.json) configures the `backend` and `frontend` services, routing `/api/*` to Express and other paths to the Vite app. The frontend service rewrites client-side routes such as `/login` to `index.html`. Both services share one public domain, so the browser uses the same-origin `/api` URL and session cookie.
 
 Configure these production environment variables in Vercel: `DATABASE_URL`, `CLIENT_ORIGIN` (the exact production URL, such as `https://gov.vercel.app`), `SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `NODE_ENV=production`. Use a managed PostgreSQL database and enter secrets directly in Vercel, not in Git.
 
