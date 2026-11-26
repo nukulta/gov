@@ -3,9 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Outlet, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, GraduationCap, ClipboardList, Database, FileText, Settings, LogOut, Menu, X, ShieldCheck, Plus, Search, Trash2, Eye, EyeOff, ChevronRight, Building2, Bell, CheckCircle2, SlidersHorizontal } from 'lucide-react';
 import axios from 'axios';
+import DemoPreview from './DemoPreview.jsx';
 import './styles.css';
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:4000/api' : '/api'), withCredentials: true });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:4000/api' : '/api'), withCredentials: true, timeout: 15000 });
 const AuthContext = React.createContext(null);
 function AuthProvider({ children }) { const [user, setUser] = useState(null); const [loading, setLoading] = useState(true); useEffect(() => { api.get('/auth/me').then(r => setUser(r.data.user)).catch(() => {}).finally(() => setLoading(false)); }, []); return <AuthContext.Provider value={{ user, setUser, loading }}>{children}</AuthContext.Provider>; }
 const useAuth = () => React.useContext(AuthContext);
@@ -27,7 +28,7 @@ function Login() {
       setUser(r.data.user);
       nav('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to sign in');
+      setError(err.code === 'ECONNABORTED' ? 'Sign-in timed out. Please try again or use the client preview.' : err.response?.data?.message || 'Unable to sign in');
     } finally {
       setBusy(false);
     }
@@ -49,6 +50,7 @@ function Login() {
           {error && <div className="alert error">{error}</div>}
           <button className="primary full" disabled={busy}>{busy ? 'Signing in…' : 'Sign in securely'} {!busy && <ChevronRight size={17} />}</button>
         </form>
+        <div className="demo-login"><span>Preparing a client presentation?</span><Link to="/demo">Open read-only preview <ChevronRight size={15} /></Link></div>
       </section>
     </section>
   </main>;
@@ -197,5 +199,5 @@ function Reports() {
   useEffect(() => { api.get('/dashboard').then(r => setDashboard(r.data)); }, []);
   return <div className="stack-lg report-page"><section className="page-title"><div><p className="eyebrow">Reports</p><h1>Training reports</h1><p className="muted">Generate printable summaries from the PostgreSQL database.</p></div><button className="primary" onClick={() => window.print()}><FileText size={16} /> Print report</button></section><div className="stats-grid">{[['Faculty',dashboard?.counts.faculty,Users],['Training programmes',dashboard?.counts.trainings,GraduationCap],['Participation records',dashboard?.counts.participation,ClipboardList],['Training database',dashboard?.counts.database,Database]].map(([label,value,Icon]) => <Stat key={label} label={label} value={value} icon={Icon} />)}</div><section className="panel"><h3>Report summary</h3><p className="muted">This report reflects the latest records stored in PostgreSQL. Sensitive financial information is excluded.</p><div className="report-links"><Link className="secondary" to="/faculty">Faculty-wise report</Link><Link className="secondary" to="/training">Training-wise report</Link><Link className="secondary" to="/participation">Participation report</Link><Link className="secondary" to="/training-database">Training database report</Link></div></section></div>;
 }
-function App() { return <AuthProvider><Routes><Route path="/login" element={<Login />} /><Route element={<Protected />}><Route path="/" element={<Dashboard />} /><Route path="/faculty" element={<RecordPage type="faculty" title="Faculty management" description="Maintain faculty master records and contact information." />} /><Route path="/training" element={<RecordPage type="training" title="Training management" description="Create and track training programmes and participants." />} /><Route path="/participation" element={<RecordPage type="participation" title="Training participation" description="Track batch size, gender and category participation totals." />} /><Route path="/training-database" element={<RecordPage type="trainingDatabase" title="Training database" description="Search the central training database." />} /><Route path="/reports" element={<Reports />} /><Route path="/admin" element={<Admin />} /></Route><Route path="*" element={<Navigate to="/" />} /></Routes></AuthProvider>; }
+function App() { const location = useLocation(); if (location.pathname.replace(/\/+$/, '') === '/demo') return <DemoPreview />; return <AuthProvider><Routes><Route path="/login" element={<Login />} /><Route element={<Protected />}><Route path="/" element={<Dashboard />} /><Route path="/faculty" element={<RecordPage type="faculty" title="Faculty management" description="Maintain faculty master records and contact information." />} /><Route path="/training" element={<RecordPage type="training" title="Training management" description="Create and track training programmes and participants." />} /><Route path="/participation" element={<RecordPage type="participation" title="Training participation" description="Track batch size, gender and category participation totals." />} /><Route path="/training-database" element={<RecordPage type="trainingDatabase" title="Training database" description="Search the central training database." />} /><Route path="/reports" element={<Reports />} /><Route path="/admin" element={<Admin />} /></Route><Route path="*" element={<Navigate to="/" />} /></Routes></AuthProvider>; }
 createRoot(document.getElementById('root')).render(<BrowserRouter><App /></BrowserRouter>);
