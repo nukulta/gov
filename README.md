@@ -41,7 +41,7 @@ Configure these production environment variables in Vercel: `DATABASE_URL`, `CLI
 
 Before serving traffic, run `npm run db:deploy --prefix backend` and `npm run db:seed --prefix backend` from a secure environment configured with the production database URL and administrator credentials. Do not commit credentials, production workbooks, or financial data.
 
-For client presentations, use `/demo` for a read-only frontend preview with fictional sample data. The preview does not call the backend; the real application remains protected by sign-in.
+For client presentations, use `/demo` for an interactive frontend preview with fictional sample data. You can add, view, edit, search, remove, and export sample records; changes are temporary to the browser session and never call the backend. Real accounts, imports, and database records remain protected by sign-in.
 
 ## Structure
 

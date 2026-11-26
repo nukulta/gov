@@ -137,6 +137,15 @@ header { height: 82px; display: flex; align-items: center; justify-content: spac
 .demo-viewer b { color: #344a5e; font-size: 12px; }
 .demo-viewer small { margin-top: 2px; color: #8a9baa; font-size: 9px; }
 .demo-badge { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 20px; background: #e8f3f5; color: #36767a; font-size: 10px; font-weight: 800; white-space: nowrap; }
+.demo-notice { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.demo-notice button { display: grid; place-items: center; padding: 3px; background: transparent; color: inherit; }
+.demo-record-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.demo-record-tools h3 { margin: 0; color: #183b56; font-size: 15px; }
+.demo-record-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.demo-record-actions .search { width: min(320px, 30vw); }
+.demo-row-actions { white-space: nowrap; }
+.demo-reset { margin-top: 16px; }
+.demo-login-link { width: fit-content; margin-top: 14px; }
 .demo-quick-links button { width: 100%; min-height: 58px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f3f6; background: transparent; color: #397ca3; text-align: left; }
 .demo-quick-links button span { flex: 1; color: #42566a; font-size: 11px; font-weight: 700; }
 .demo-quick-links button:hover { background: #fafcff; }
@@ -257,5 +266,6 @@ tbody tr:hover { background: #f9fbfd; }
   .demo-banner { align-items: flex-start; padding: 10px 16px; } .demo-banner a { padding-top: 2px; } .demo-viewer > div:not(.avatar) { display: none; } .demo-login { align-items: flex-start; flex-direction: column; }
   .welcome, .page-title { align-items: flex-start; flex-direction: column; gap: 12px; } .welcome { width: 100%; } .welcome > .primary { margin: 0; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .stat { min-height: 82px; padding: 12px; } .stat strong { font-size: 20px; } .stat span { white-space: normal; }
   .form-grid, .dropdown-form { grid-template-columns: 1fr; } .modal { padding: 18px; } .login-card { padding: 32px 24px; }
+  .demo-record-tools, .demo-record-actions { align-items: stretch; flex-direction: column; } .demo-record-actions .search { width: 100%; max-width: none; }
   .column-filters, .filter-fields { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
 }
