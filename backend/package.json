@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "node prisma/seed.js",
     "db:import-datasets": "node prisma/import-datasets.js",
     "test": "node --test"

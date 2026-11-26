@@ -35,9 +35,11 @@ The seed command creates the administrator from `ADMIN_EMAIL` and `ADMIN_PASSWOR
 
 ## Vercel deployment
 
-Deploy `frontend/` and `backend/` as separate Vercel projects. Set `VITE_API_BASE_URL` in the frontend project to the backend URL ending in `/api`. In the backend project, configure `DATABASE_URL`, `CLIENT_ORIGIN` (the exact frontend origin), `SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` as Vercel environment variables. Use a managed PostgreSQL database and run Prisma migrations before serving traffic.
+Import the repository root as one Vercel project. [vercel.json](./vercel.json) configures the `backend` and `frontend` services, routing `/api/*` to Express and other paths to the Vite app. Both services share one public domain, so the browser uses the same-origin `/api` URL and session cookie.
 
-The session cookie is `SameSite=Lax`; use frontend and backend custom domains under the same site (for example, `portal.example.com` and `api.example.com`) so authenticated browser requests can send the cookie. Do not commit credentials, production workbooks, or financial data.
+Configure these production environment variables in Vercel: `DATABASE_URL`, `CLIENT_ORIGIN` (the exact production URL, such as `https://gov.vercel.app`), `SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `NODE_ENV=production`. Use a managed PostgreSQL database and enter secrets directly in Vercel, not in Git.
+
+Before serving traffic, run `npm run db:deploy --prefix backend` and `npm run db:seed --prefix backend` from a secure environment configured with the production database URL and administrator credentials. Do not commit credentials, production workbooks, or financial data.
 
 ## Structure
 
